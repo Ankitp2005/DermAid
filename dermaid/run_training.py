@@ -9,6 +9,10 @@ import numpy as np
 import torch
 from sklearn.metrics import recall_score
 
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 # Add src to python path to allow imports
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
