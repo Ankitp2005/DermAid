@@ -1,0 +1,9 @@
+data/raw/
+data/processed/
+*.pth
+*.onnx
+*.tflite
+__pycache__/
+.ipynb_checkpoints/
+*.db
+dermaid_cases.db
