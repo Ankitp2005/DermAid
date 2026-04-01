@@ -27,15 +27,17 @@ def extract_features(model, dataloader, device):
             # Pass through backbone
             features = model.backbone(images)
             
-            # Apply avgpool and flatten
-            if hasattr(model, 'avgpool'):
-                features = model.avgpool(features)
-            elif hasattr(model.backbone, 'avgpool'):
-                features = model.backbone.avgpool(features)
-            elif features.dim() == 4:
-                features = F.adaptive_avg_pool2d(features, (1, 1))
-                
-            features = torch.flatten(features, 1)
+            # Apply avgpool and flatten only if the output is spatial (4D)
+            if features.dim() == 4:
+                if hasattr(model, 'avgpool'):
+                    features = model.avgpool(features)
+                elif hasattr(model.backbone, 'avgpool'):
+                    features = model.backbone.avgpool(features)
+                else:
+                    features = F.adaptive_avg_pool2d(features, (1, 1))
+                    
+            if features.dim() > 2:
+                features = torch.flatten(features, 1)
             
             all_features.append(features.cpu().numpy())
             all_labels.append(condition_labels.numpy())
