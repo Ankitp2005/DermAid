@@ -9,9 +9,9 @@ def convert_onnx_to_tflite(onnx_path, tflite_path="export/dermaid_int8.tflite"):
     saved_model_dir = "export/saved_model"
     
     # Run onnx2tf to convert ONNX to TF SavedModel
-    # -nonc avoids forcing NCHW in TF if NHWC is optimal, but PyTorch natively uses NCHW
+    # -osd forces it to physically dump the SavedModel directory so we can run our custom INT8 pass on it.
     try:
-        subprocess.run(["onnx2tf", "-i", onnx_path, "-o", saved_model_dir], check=True)
+        subprocess.run(["onnx2tf", "-i", onnx_path, "-o", saved_model_dir, "-osd"], check=True)
     except FileNotFoundError:
         print("Error: onnx2tf not found. Please install it via 'pip install onnx2tf'")
         sys.exit(1)
