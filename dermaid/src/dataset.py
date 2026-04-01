@@ -37,7 +37,7 @@ class HAM10000Dataset(Dataset):
         row = self.metadata.iloc[idx]
         img_id = row['image_id']
         dx = row['dx']
-        patient_id = row['patient_id']
+        lesion_id = row['lesion_id']
         
         img_path = os.path.join(self.img_dir, f"{img_id}.jpg")
         
@@ -58,11 +58,11 @@ class HAM10000Dataset(Dataset):
         condition_label = self.dx_to_idx[dx]
         severity_label = self.severity_map[dx]
         
-        return image, condition_label, severity_label, patient_id
+        return image, condition_label, severity_label, lesion_id
 
 def patient_level_split(metadata_df, train_ratio=0.70, val_ratio=0.15, seed=42):
-    # Split by patient_id, stratified by dx
-    patient_df = metadata_df.groupby('patient_id').first().reset_index()
+    # Split by lesion_id, stratified by dx
+    patient_df = metadata_df.groupby('lesion_id').first().reset_index()
     
     test_ratio = 1.0 - train_ratio - val_ratio
     
@@ -80,9 +80,9 @@ def patient_level_split(metadata_df, train_ratio=0.70, val_ratio=0.15, seed=42):
         random_state=seed
     )
     
-    train_df = metadata_df[metadata_df['patient_id'].isin(train_patients['patient_id'])].reset_index(drop=True)
-    val_df = metadata_df[metadata_df['patient_id'].isin(val_patients['patient_id'])].reset_index(drop=True)
-    test_df = metadata_df[metadata_df['patient_id'].isin(test_patients['patient_id'])].reset_index(drop=True)
+    train_df = metadata_df[metadata_df['lesion_id'].isin(train_patients['lesion_id'])].reset_index(drop=True)
+    val_df = metadata_df[metadata_df['lesion_id'].isin(val_patients['lesion_id'])].reset_index(drop=True)
+    test_df = metadata_df[metadata_df['lesion_id'].isin(test_patients['lesion_id'])].reset_index(drop=True)
     
     return train_df, val_df, test_df
 
@@ -94,7 +94,7 @@ def get_dataloaders(data_dir, batch_size=32, num_workers=4):
     if metadata_path.exists():
         metadata_df = pd.read_csv(metadata_path)
     else:
-        metadata_df = pd.DataFrame(columns=['image_id', 'dx', 'dx_type', 'age', 'sex', 'localization', 'patient_id'])
+        metadata_df = pd.DataFrame(columns=['image_id', 'dx', 'dx_type', 'age', 'sex', 'localization', 'lesion_id'])
     
     if len(metadata_df) > 0:
         train_df, val_df, test_df = patient_level_split(
