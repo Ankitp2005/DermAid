@@ -12,8 +12,8 @@ class DermAidLoss(nn.Module):
         self.condition_loss = nn.CrossEntropyLoss(weight=class_weights)
         self.severity_loss = nn.CrossEntropyLoss()
         
-        # Binary Cross Entropy for confidence prediction (which outputs via Sigmoid)
-        self.conf_loss = nn.BCELoss()
+        # Binary Cross Entropy for confidence prediction (which outputs raw logits now for AMP stability)
+        self.conf_loss = nn.BCEWithLogitsLoss()
 
     def forward(self, cond_pred, sev_pred, conf_pred, cond_true, sev_true):
         # Primary condition classification loss

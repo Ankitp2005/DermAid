@@ -41,8 +41,7 @@ class DermAidModel(nn.Module):
         self.confidence_head = nn.Sequential(
             nn.Linear(960, 128),
             nn.Hardswish(),
-            nn.Linear(128, 1),
-            nn.Sigmoid()
+            nn.Linear(128, 1)
         )
 
     def forward(self, x):
@@ -74,8 +73,8 @@ class DermAidModel(nn.Module):
         sev_probs = torch.softmax(severity_logits[0], dim=0).cpu().numpy().tolist()
         sev_class = int(torch.argmax(severity_logits[0]).item())
         
-        # For a single sigmoid output
-        conf_val = float(confidence[0].item())
+        # For a single sigmoid output (apply sigmoid here since it's removed from head for AMP stability)
+        conf_val = float(torch.sigmoid(confidence[0]).item())
         
         if was_training:
             self.train()
