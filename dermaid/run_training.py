@@ -116,7 +116,13 @@ def main():
     print(f"Initialized with device: {device}")
 
     if WANDB_AVAILABLE:
-        wandb.init(project='dermaid-poc2026', config=vars(args))
+        try:
+            os.environ.setdefault("WANDB_MODE", os.environ.get("WANDB_MODE", "online"))
+            wandb.init(project='dermaid-poc2026', config=vars(args))
+        except Exception as e:
+            print(f"[wandb] Disabled (no API key configured): {e}")
+            os.environ["WANDB_MODE"] = "disabled"
+            WANDB_AVAILABLE = False
     
     model = DermAidModel().to(device)
     
